@@ -1,11 +1,13 @@
 import React from 'react';
+improt * as firebase from 'firebase';
 
 //
 // Initial State
 //
 
 const initialState = {
-  favoriteAnimal: "duck"
+  favoriteAnimal: "duck",
+  personData: { },
 };
 
 //
@@ -22,10 +24,28 @@ export class AppProvider extends React.Component {
     this.state = initialState;
   }
   
+  setFavoriteAnimal = (text) => {
+    this.setState({favoriteAnimal: text}); 
+  }
+  
+  setPersonData = (personData) => {
+    this.setState({ personData: personData }); 
+  }
+  
+  watchPersonData = () => {
+    firebase.database().ref("person").on("value", function(snapshot) {
+       var personData = snapshot.val();
+       this.setPersonData(personData);
+    }.bind(this), function(error) { });
+  }
+  
   render() {
     return (
       <AppContext.Provider value={{
-        favoriteAnimal: this.state.favoriteAnimal
+        favoriteAnimal: this.state.favoriteAnimal,
+        personData: this.state.personData,
+        setFavoriteAnimal: this.setFavoriteAnimal,
+        watchPersonData: this.watchPersonData,
       }}>
         {this.props.children}
       </AppContext.Provider>
